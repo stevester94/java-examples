@@ -1,0 +1,8 @@
+// You cannot do this. You'll get an error when trying to import myPackage.Broken
+// Note though you don't get an error when you build this package
+
+package shmmitty;
+
+public class Broken {
+
+}
