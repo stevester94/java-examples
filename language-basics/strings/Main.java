@@ -14,10 +14,6 @@ public class Main {
         // which is mutable
         StringBuilder sb = new StringBuilder(a);
         sb.append( "Another" );
-        sb[0] = 'j';
         System.out.println( sb.toString() );
-
-        
-
     }
 }

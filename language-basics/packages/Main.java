@@ -1,6 +1,11 @@
-import myPackage.Another;
+/*
+ * - Packages do not nest. Ex: java.util and java.util.regex have nothing to do with each other.
+ * - Import declarations are a convenience, not a necessity.
+ * - Package naming must match their directory structure
+ */
 
-import myPackage.Broken;
+
+import myPackage.Another;
 
 public class Main {
     public static void main( String[] args ) {
@@ -8,7 +13,7 @@ public class Main {
 
         Another a; // a will be null
 
-        // The compiler will not let you do this
+        // The compiler will not let you do this because a has provably never been initialized
         // if( a == null ) {
         //     System.out.println( "a is null");
         // }
