@@ -37,8 +37,6 @@ class HTTP_Handler implements TcpListener.Handler {
         } else {
             return retString.getBytes(Charset.defaultCharset());
         }
-
-
     }
 
     public byte[] handlePost( String path, byte[] body ) {

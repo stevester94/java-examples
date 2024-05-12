@@ -1,3 +1,4 @@
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -5,6 +6,7 @@ import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Map;
@@ -80,40 +82,82 @@ public class Main {
         m.put("lel", m.getOrDefault("lel", 0) + 1 );
     }
 
+    /*
+     * - List.of(<>,<>,...) is a varargs method and expects the actual elements
+     * - Arrays.asList does indeed take an array, but must be an array of the wrapper type, not primitive
+     *   - It does not make a copy
+     * - You can use streams to convert primitive arrays, but these are making copies
+     *   - Only primitives int, long, float have streams
+     *   - For the rest you either must use a workaround to get a stream (such as ByteBuffer) or just use a for loop
+     * 
+     * - I think the crux really is that generics in java do not support primitive types
+     */
     static void initialization() {
-        int[] ar = {1,2,3};
-        
-        
+        byte[] b = {1,2,4};
+        int[] i = {1,2,4};
 
-        
+        Byte[] w_b = {1,2,3};
+        Integer[] w_i = {1,2,3};
+
+
         /*
-         * Autoboxing does not work for this! You actually must get more technical
+         * List.of cannot take args like this. They are actuall vararg methods which expect actual elements
          */
-        // List<Integer> asList = Arrays.asList( ar );
+        // List<Byte> bytes = List.of( b );
+        // List<Integer> bytes = List.of( i );
 
+        /*
+         * Arrays.asList expects wrapper classes, not primitives
+         */
+        // List<Byte> bytes = Arrays.asList( b );
+        // List<Integer> ints = Arrays.asList( i );
 
-        // This is one of the better ways. Note the `boxed()` stream operator
+        /*
+         * These both work because the arrays are of the wrapper classes
+         */
+        List<Byte> bytes = Arrays.asList( w_b );
+        List<Integer> ints = Arrays.asList( w_i );
+
+        /*
+         * So, if you want a list of the wrapper type from a primitive, you have to manually create them
+         * 
+         * Streams are the best way I've found
+         */
+
+        // For integers
         {
-            ArrayList<Integer> al = new ArrayList<>();
-            Arrays.stream( ar ).boxed().forEach( i -> al.add(i) );
+            ArrayList<Integer> al = new ArrayList<>(i.length);
+            Arrays.stream( i ).boxed().forEach( in -> al.add(in) );
             System.out.println( al );
         }
-
         // You can also use a collector
         {
-            List<Integer> list = Arrays.stream( ar ).boxed().collect( Collectors.toList() );
+            List<Integer> list = Arrays.stream( i ).boxed().collect( Collectors.toList() );
             ArrayList<Integer> al = new ArrayList<>(list);
             System.out.println( al );
         }
 
-        // For whatever fucking reason there is no byte stream.
-        // byte[] ar_2 = {1,2,3};
-        // Arrays.stream( ar_2 );
-        
-        
+        /*
+         * For whatever fucking reason, there is a stream only for int, long, double. Not byte!
+         */
+        {
+            // Can't do this!
+            // Arrays.stream( b );
+
+            // So either you just manually build a list/array, or use this horrible byte buffer stream thing
+            ByteBuffer bb = ByteBuffer.wrap( b );
+            List<Byte> l = Stream.generate( bb::get )
+                .limit(bb.remaining()) // Not entirely sure why the remaining criterion is needed
+                .collect( Collectors.toList() );
+        }
+
+        // The manual way
+        {
+            List<Byte> l = new ArrayList<Byte>(b.length);
+            for( byte _b : b )
+                l.add(_b);
+        }
+
 
     }
-
-    
 }
-
