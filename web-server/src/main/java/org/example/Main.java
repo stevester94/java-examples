@@ -1,15 +1,41 @@
 package org.example;
+
+import java.nio.charset.Charset;
+
 public class Main {
+
+
     public static void main(String[] args) {
-        int x = 1;
-        int y = 2;
-        int[]ar = {1,2,3};
+        StaticFileServer sfs = new StaticFileServer( "/home/steven/Projects/java-examples/web-server/public" );
+        TcpListener listener = new TcpListener(1337, new HTTP_Handler(sfs) );
+        listener.start();
+    }
+}
 
-        System.out.print("Hello and welcome!");
+class HTTP_Handler implements TcpListener.Handler {
+    final private StaticFileServer files;
 
-        for (int i = 1; i <= 5; i++) {
-            System.out.println("i = " + i);
-            System.out.println( x );
+    public HTTP_Handler( StaticFileServer files ) {
+        this.files = files;
+    }
+
+    public byte[] handleGet( String path ) {
+        String retString = "default";
+
+        if( path.equals("/") ) {
+            path = "/index.html";
         }
+
+        path = path.substring(1);
+
+        if( files.hasItem(path) ) {
+            return files.getAsBytes(path);
+        }
+
+        return retString.getBytes(Charset.defaultCharset());
+    }
+
+    public byte[] handlePost( String path, byte[] body ) {
+        return "Hello".getBytes(Charset.defaultCharset());
     }
 }

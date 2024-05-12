@@ -1,18 +1,21 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
-        sets();
-        lists();
-        iterators();
-        maps();
+        // sets();
+        // lists();
+        // iterators();
+        // maps();
+        initialization();
     }
 
     /*
@@ -75,9 +78,39 @@ public class Main {
 
         // TODO: There's a merge method that makes this more elegant. Look into best/common practices
         m.put("lel", m.getOrDefault("lel", 0) + 1 );
+    }
 
+    static void initialization() {
+        int[] ar = {1,2,3};
+        
         
 
+        
+        /*
+         * Autoboxing does not work for this! You actually must get more technical
+         */
+        // List<Integer> asList = Arrays.asList( ar );
+
+
+        // This is one of the better ways. Note the `boxed()` stream operator
+        {
+            ArrayList<Integer> al = new ArrayList<>();
+            Arrays.stream( ar ).boxed().forEach( i -> al.add(i) );
+            System.out.println( al );
+        }
+
+        // You can also use a collector
+        {
+            List<Integer> list = Arrays.stream( ar ).boxed().collect( Collectors.toList() );
+            ArrayList<Integer> al = new ArrayList<>(list);
+            System.out.println( al );
+        }
+
+        // For whatever fucking reason there is no byte stream.
+        // byte[] ar_2 = {1,2,3};
+        // Arrays.stream( ar_2 );
+        
+        
 
     }
 
