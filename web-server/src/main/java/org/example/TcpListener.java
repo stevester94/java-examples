@@ -85,7 +85,7 @@ public class TcpListener {
             while( true ) {
                 System.out.println( "Blocking read" );
                 int b = inputStream.read(); // This blocks
-                System.out.println( "Blocking read done" + b );
+                System.out.println( "Blocking read done: " + b );
 
                 if (b == -1) {
                     System.out.println( "Client has hung up" );
@@ -102,9 +102,8 @@ public class TcpListener {
 
                 // You can't create a string from an arraylist of bytes
                 String got = new String( bytes, Charset.defaultCharset() );
-                System.out.print( got );
 
-                String[] lines = got.split( "\n" );
+                String[] lines = got.split( "\r\n" );
                 String[] splits = lines[0].split( " " );
                 if( splits.length != 3 ) {
                     System.err.println( "Got a malformed request. Splits: " + Arrays.toString(splits) );
@@ -115,6 +114,15 @@ public class TcpListener {
                 String path    = splits[1];
                 String version = splits[2];
 
+                int bodyStart = Arrays.asList(lines).indexOf("") + 1;
+                String body;
+                if( bodyStart < lines.length )
+                    body = lines[bodyStart];
+                else
+                    body = "";
+
+
+
 
                 if( method.equals("GET") ) {
                     System.out.printf( "Method: GET, Path: %s\n", path );
@@ -123,7 +131,7 @@ public class TcpListener {
                     break;
                 } else if( method.equals("POST") ) {
                     System.out.printf( "Method: POST, Path: %s\n", path );
-                    outputStream.write( handler.handlePost( path, "".getBytes(StandardCharsets.UTF_8) ) );
+                    outputStream.write( generateHttpResponse( handler.handlePost( path, body.getBytes(StandardCharsets.UTF_8) ) ) );
                     outputStream.flush();
                 } else {
                     System.err.println( "Unsupported method" );
